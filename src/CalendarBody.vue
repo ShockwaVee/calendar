@@ -11,26 +11,21 @@
         v-for="calendarDay in calendarDays"
         :key="calendarDay.momentObject.format()"
       >
-        <div
-          class="calendar__working-hours"
-          v-if="calendarDay.workingHours"
-          :style="{
-            height:
-              calendarDay.workingHours.to -
-              calendarDay.workingHours.from +
-              'px',
-            top: calendarDay.workingHours.from + 'px'
-          }"
-        ></div>
+        <CalendarCell :calendar-day="calendarDay"></CalendarCell>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts">
+import Vue from "vue";
 import { formatHoursAndMinutes } from "@/helpers/DataFormatter";
+import CalendarCell from "@/components/CalendarCell.vue";
 
-export default {
+export default Vue.extend({
   name: "CalendarBody",
+  components: {
+    CalendarCell
+  },
   data() {
     return {
       hoursInDay: [...Array(24).keys()]
@@ -46,7 +41,7 @@ export default {
       return formatHoursAndMinutes(hours, minutes);
     }
   }
-};
+});
 </script>
 <style lang="scss" scoped>
 .calendar {
@@ -64,19 +59,13 @@ export default {
     border-right: 1px solid black;
     background-color: rgba(211, 211, 211, 0.81);
     position: relative;
-    z-index: -1;
   }
 
   &__time-column {
     display: flex;
     flex-direction: column;
     width: 42px;
-  }
-
-  &__working-hours {
-    width: 100%;
-    position: absolute;
-    background-color: white;
+    z-index: 1;
   }
 
   &__time-cell {
