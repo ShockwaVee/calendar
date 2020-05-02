@@ -10,7 +10,19 @@
         class="calendar__body-cell"
         v-for="calendarDay in calendarDays"
         :key="calendarDay.momentObject.format()"
-      ></div>
+      >
+        <div
+          class="calendar__working-hours"
+          v-if="calendarDay.workingHours"
+          :style="{
+            height:
+              calendarDay.workingHours.to -
+              calendarDay.workingHours.from +
+              'px',
+            top: calendarDay.workingHours.from + 'px'
+          }"
+        ></div>
+      </div>
     </div>
   </div>
 </template>
@@ -49,7 +61,10 @@ export default {
 
   &__body-cell {
     flex: 0 0 120px;
-    border-right: 1px solid hsla(0, 0%, 76.9%, 0.3);
+    border-right: 1px solid black;
+    background-color: rgba(211, 211, 211, 0.81);
+    position: relative;
+    z-index: -1;
   }
 
   &__time-column {
@@ -58,16 +73,22 @@ export default {
     width: 42px;
   }
 
+  &__working-hours {
+    width: 100%;
+    position: absolute;
+    background-color: white;
+  }
+
   &__time-cell {
     height: 40px;
-    border-right: 1px solid hsla(0, 0%, 76.9%, 0.3);
+    border-right: 1px solid black;
 
-    &::before {
+    &::after {
       content: "";
       position: absolute;
       left: 0;
       right: 0;
-      border-top: 1px solid hsla(0, 0%, 76.9%, 0.3);
+      border-top: 1px solid black;
     }
   }
 }

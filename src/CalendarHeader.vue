@@ -2,7 +2,7 @@
   <div class="calendar__header">
     <div class="calendar__header-title" v-if="calendarDays.length > 0">
       <h4>
-        Tjedan {{ calendarDays[0].momentObject.format("ww") }} -
+        {{ calendarDays[0].momentObject.format("MMMM") }} -
         {{ calendarDays[0].momentObject.format("yyyy") }}
       </h4>
     </div>
@@ -12,7 +12,7 @@
         v-for="calendarDay in calendarDays"
         :key="calendarDay.momentObject.format()"
       >
-        <span>{{ calendarDay.momentObject.format("dddd DD") }}</span>
+        <span>{{ calendarDay.momentObject.format("dddd Do") }}</span>
       </div>
     </div>
   </div>
