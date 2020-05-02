@@ -1,4 +1,5 @@
 import moment, { Moment } from "moment";
+import { CalendarDay } from "@/interfaces/CalendarDay";
 
 export class CalendarService {
   private readonly startingDate: Moment;
@@ -7,8 +8,8 @@ export class CalendarService {
     this.startingDate = moment(startingDate);
   }
 
-  public generateNDays(numberOfDays: number) {
-    const calendarDays = [];
+  public generateNDays(numberOfDays: number): CalendarDay[] {
+    const calendarDays: CalendarDay[] = [];
     let currentDate = this.startingDate.clone();
 
     for (let i = 0; i < numberOfDays; i++) {
