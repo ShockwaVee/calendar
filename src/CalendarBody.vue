@@ -33,7 +33,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      hoursInDay: [...Array(24).keys()]
+      hoursInDay: [...Array(24).keys()].filter(n => n >= 7 && n <= 20)
     };
   },
   props: ["calendarDays", "events"],
@@ -78,7 +78,7 @@ export default Vue.extend({
   }
 
   &__time-cell {
-    height: 40px;
+    height: 60px;
     border-right: 1px solid black;
 
     &::after {
@@ -87,6 +87,7 @@ export default Vue.extend({
       left: 0;
       right: 0;
       border-top: 1px solid black;
+      pointer-events: none;
     }
   }
 }

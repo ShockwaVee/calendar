@@ -21,6 +21,10 @@
 import Vue from "vue";
 import CalendarEvent from "@/components/CalendarEvent.vue";
 import EventBus, { EventBusEvents } from "@/helpers/EventBus";
+import {
+  convertTimeToHeightPixels,
+  convertTimeToTopPixels
+} from "@/helpers/DataFormatter";
 
 export default Vue.extend({
   name: "CalendarCell",
@@ -33,21 +37,24 @@ export default Vue.extend({
       if (this.calendarDay.workingHours == null) {
         return 0;
       }
-      const toPixels =
-        this.calendarDay.workingHours.to.hours * 40 +
-        (this.calendarDay.workingHours.to.minutes / 60) * 40;
-      const fromPixels =
-        this.calendarDay.workingHours.from.hours * 40 +
-        (this.calendarDay.workingHours.from.minutes / 60) * 40;
+      const toPixels = convertTimeToHeightPixels(
+        this.calendarDay.workingHours.to.hours,
+        this.calendarDay.workingHours.to.minutes
+      );
+      const fromPixels = convertTimeToHeightPixels(
+        this.calendarDay.workingHours.from.hours,
+        this.calendarDay.workingHours.from.minutes
+      );
       return toPixels - fromPixels + "px";
     },
     workingHoursTop(): string | number {
       if (this.calendarDay.workingHours == null) {
         return 0;
       }
-      const fromPixels =
-        this.calendarDay.workingHours.from.hours * 40 +
-        (this.calendarDay.workingHours.from.minutes / 60) * 40;
+      const fromPixels = convertTimeToTopPixels(
+        this.calendarDay.workingHours.from.hours,
+        this.calendarDay.workingHours.from.minutes
+      );
       return fromPixels + "px";
     },
     allEvents(): CalendarEvent[] {

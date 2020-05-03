@@ -1,11 +1,12 @@
 <template>
   <div
     class="calendar__event"
+    :class="{ 'is-user-generated': event.isUserGenerated }"
     @mouseenter="isTooltipVisible = true"
     @mouseleave="isTooltipVisible = false"
     :style="{
-      height: workingHoursHeight,
-      top: workingHoursTop
+      height: eventHeight,
+      top: eventTop
     }"
   >
     <transition name="slide-fade">
@@ -21,23 +22,31 @@
 </template>
 <script lang="ts">
 import Vue from "vue";
+import {
+  convertTimeToHeightPixels,
+  convertTimeToTopPixels
+} from "@/helpers/DataFormatter";
 
 export default Vue.extend({
   name: "CalendarEvent",
   props: ["event"],
   computed: {
-    workingHoursHeight() {
-      const toPixels =
-        this.event.time.to.hours * 40 + (this.event.time.to.minutes / 60) * 40;
-      const fromPixels =
-        this.event.time.from.hours * 40 +
-        (this.event.time.from.minutes / 60) * 40;
+    eventHeight(): string {
+      const toPixels = convertTimeToHeightPixels(
+        this.event.time.to.hours,
+        this.event.time.to.minutes
+      );
+      const fromPixels = convertTimeToHeightPixels(
+        this.event.time.from.hours,
+        this.event.time.from.minutes
+      );
       return toPixels - fromPixels + "px";
     },
-    workingHoursTop() {
-      const fromPixels =
-        this.event.time.from.hours * 40 +
-        (this.event.time.from.minutes / 60) * 40;
+    eventTop(): string {
+      const fromPixels = convertTimeToTopPixels(
+        this.event.time.from.hours,
+        this.event.time.from.minutes
+      );
       return fromPixels + "px";
     }
   },
@@ -58,6 +67,9 @@ export default Vue.extend({
     border-radius: 3px;
     border: 1px solid black;
     cursor: pointer;
+    &.is-user-generated {
+      background-color: green;
+    }
   }
   &__additional-info {
     top: -108px;

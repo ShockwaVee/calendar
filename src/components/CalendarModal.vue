@@ -1,9 +1,10 @@
 <template>
-  <div v-show="isVisible" class="modal__wrapper" @click.self.capture="onClose">
+  <div v-show="isVisible" class="modal__wrapper">
     <div class="modal">
       <input type="date" v-model="eventInfo.date" />
       <input type="text" v-model="eventInfo.hours" />
       <input type="text" v-model="eventInfo.minutes" />
+      <input type="text" v-model="eventInfo.title" />
       <button @click="onClose">X</button>
       <button @click="onCreateEvent">Stvori</button>
     </div>
@@ -25,7 +26,8 @@ export default Vue.extend({
       eventInfo: {
         date: new Date(),
         hours: "",
-        minutes: ""
+        minutes: "",
+        title: ""
       },
       calendarDay: null as null | CalendarDay
     };
@@ -36,16 +38,20 @@ export default Vue.extend({
     },
     onOpen({ yPosition, date }: { yPosition: number; date: CalendarDay }) {
       this.isVisible = true;
-      const hours = Math.floor(yPosition / 40);
-      const minutes = Math.floor(+(yPosition / 40 - hours).toFixed(3) * 60);
+      const hours = Math.floor(yPosition / 60 + 7);
+      const minutes = yPosition % 60;
       this.eventInfo.hours = hours < 10 ? `0${hours}` : String(hours);
       this.eventInfo.minutes = minutes < 10 ? `0${minutes}` : String(minutes);
       this.eventInfo.date = date.momentObject.toDate();
       this.calendarDay = date;
     },
     createEvent(hours: number, minutes: number, date: Moment) {
+      if (this.eventInfo.title.trim().length <= 0) {
+        this.$toasted.error("Molimo da ispravno upišete naziv termina");
+        return;
+      }
       return CalendarService.constructEvent({
-        title: "test",
+        title: this.eventInfo.title,
         from: {
           hours,
           minutes,

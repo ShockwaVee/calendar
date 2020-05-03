@@ -4,5 +4,6 @@ export default EventBus;
 
 export const EventBusEvents = {
   openModal: "openModal",
-  addEvent: "addEvent"
+  addEvent: "addEvent",
+  editEvent: "editEvent"
 };
