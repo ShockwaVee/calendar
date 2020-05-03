@@ -3,6 +3,7 @@ import { CalendarDay } from "@/interfaces/CalendarDay";
 import { EventHours } from "@/interfaces/EventHours";
 import { CalendarEvent } from "@/interfaces/CalendarEvent";
 import { EventHoursInput } from "@/interfaces/EventHoursInput";
+import { EventConstructor } from "@/interfaces/EventConstructor";
 
 export class CalendarService {
   private readonly startingDate: Moment;
@@ -68,11 +69,11 @@ export class CalendarService {
         date: currentDate.format("MM/DD/YYYY")
       };
 
-      let breakEvent: CalendarEvent | null = CalendarService.constructEvent(
-        "Pauza",
+      let breakEvent: CalendarEvent | null = CalendarService.constructEvent({
+        title: "Pauza",
         from,
         to
-      );
+      });
 
       if (currentDate.date() % 2) {
         workingHours = this.workingHoursAlternative;
@@ -80,7 +81,11 @@ export class CalendarService {
         from.minutes = this.breakAlternative.from.minutes;
         to.hours = this.breakAlternative.to.hours;
         to.minutes = this.breakAlternative.to.minutes;
-        breakEvent = CalendarService.constructEvent("Pauza", from, to);
+        breakEvent = CalendarService.constructEvent({
+          title: "Pauza",
+          from,
+          to
+        });
       }
       if (
         currentDate.weekday() === 6 ||
@@ -100,15 +105,21 @@ export class CalendarService {
     return calendarDays;
   }
 
-  public static constructEvent(
-    title: string,
-    from: EventHoursInput,
-    to: EventHoursInput
-  ): CalendarEvent {
+  public static constructEvent({
+    title,
+    from,
+    to,
+    isUserGenerated = false
+  }: EventConstructor): CalendarEvent {
     const momentObjectFrom = moment(
       `${from.date} ${from.hours}:${from.minutes}`
     );
-    const momentObjectTo = moment(`${to.date} ${to.hours}:${to.minutes}`);
+    let momentObjectTo;
+    if (to == null) {
+      momentObjectTo = momentObjectFrom.clone().add(30, "m");
+    } else {
+      momentObjectTo = moment(`${to.date} ${to.hours}:${to.minutes}`);
+    }
     return {
       title,
       time: {
@@ -117,12 +128,13 @@ export class CalendarService {
           minutes: from.minutes
         },
         to: {
-          hours: to.hours,
-          minutes: to.minutes
+          hours: momentObjectTo.hour(),
+          minutes: momentObjectTo.minute()
         }
       },
       momentObjectFrom,
-      momentObjectTo
+      momentObjectTo,
+      isUserGenerated
     };
   }
 
@@ -178,5 +190,28 @@ export class CalendarService {
       }
     });
     return isOverlapping;
+  }
+  public static validateMaximumNumberOfEvents(
+    event: CalendarEvent,
+    events: CalendarEvent[]
+  ) {
+    const numberOfUserGeneratedEvents = events.filter(calendarEvent => {
+      return calendarEvent.isUserGenerated;
+    });
+    console.log(numberOfUserGeneratedEvents);
+    if (numberOfUserGeneratedEvents.length >= 2) {
+      return "Ne možete zakazati više od dva termina tjedno";
+    }
+    for (const calendarEvent of events) {
+      console.log(calendarEvent);
+      if (
+        calendarEvent.momentObjectFrom.isSame(event.momentObjectFrom, "day") &&
+        calendarEvent.isUserGenerated
+      ) {
+        console.log("hzs");
+        return "Ne možete zakazati više od jednog termina dnevno!";
+      }
+    }
+    return true;
   }
 }

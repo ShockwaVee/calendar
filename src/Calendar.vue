@@ -2,6 +2,7 @@
   <div class="calendar">
     <CalendarHeader :calendar-days="calendarDays" />
     <CalendarBody :calendar-days="calendarDays" :events="events" />
+    <CalendarModal @addEvent="onAddEvent" :events="events"></CalendarModal>
   </div>
 </template>
 <script lang="ts">
@@ -11,10 +12,11 @@ import { CalendarDay } from "@/interfaces/CalendarDay";
 import CalendarHeader from "@/CalendarHeader.vue";
 import CalendarBody from "@/CalendarBody.vue";
 import { CalendarEvent } from "@/interfaces/CalendarEvent";
+import CalendarModal from "@/components/CalendarModal.vue";
 
 export default Vue.extend({
   name: "Calendar",
-  components: { CalendarBody, CalendarHeader },
+  components: { CalendarBody, CalendarHeader, CalendarModal },
   data() {
     return {
       calendarService: null as null | CalendarService,
@@ -50,19 +52,19 @@ export default Vue.extend({
           return;
         }
         const generatedEndDate = generatedDate.clone().add(30, "minutes");
-        const generatedEvent = CalendarService.constructEvent(
-          "test",
-          {
+        const generatedEvent = CalendarService.constructEvent({
+          title: "test",
+          from: {
             hours: generatedDate.hour(),
             minutes: generatedDate.minute(),
             date: generatedDate.format("MM/DD/YYYY")
           },
-          {
+          to: {
             hours: generatedEndDate.hour(),
             minutes: generatedEndDate.minute(),
             date: generatedEndDate.format("MM/DD/YYYY")
           }
-        );
+        });
         if (
           CalendarService.validateEvent(generatedEvent, calendarDay) &&
           !CalendarService.validateOverlapping(
@@ -75,6 +77,9 @@ export default Vue.extend({
         }
       }
       this.events = generatedEvents;
+    },
+    onAddEvent(newEvent: CalendarEvent) {
+      this.events.push(newEvent);
     }
   }
 });

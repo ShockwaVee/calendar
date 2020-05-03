@@ -6,4 +6,5 @@ export interface CalendarEvent {
   title: string;
   momentObjectFrom: Moment;
   momentObjectTo: Moment;
+  isUserGenerated: boolean;
 }
