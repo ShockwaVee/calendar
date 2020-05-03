@@ -4,8 +4,8 @@
     @mouseenter="isTooltipVisible = true"
     @mouseleave="isTooltipVisible = false"
     :style="{
-      height: event.time.to - event.time.from + 'px',
-      top: event.time.from + 'px'
+      height: workingHoursHeight,
+      top: workingHoursTop
     }"
   >
     <transition name="slide-fade">
@@ -25,6 +25,22 @@ import Vue from "vue";
 export default Vue.extend({
   name: "CalendarEvent",
   props: ["event"],
+  computed: {
+    workingHoursHeight() {
+      const toPixels =
+        this.event.time.to.hours * 40 + (this.event.time.to.minutes / 60) * 40;
+      const fromPixels =
+        this.event.time.from.hours * 40 +
+        (this.event.time.from.minutes / 60) * 40;
+      return toPixels - fromPixels + "px";
+    },
+    workingHoursTop() {
+      const fromPixels =
+        this.event.time.from.hours * 40 +
+        (this.event.time.from.minutes / 60) * 40;
+      return fromPixels + "px";
+    }
+  },
   data() {
     return {
       isTooltipVisible: false
@@ -35,13 +51,13 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .calendar {
   &__event {
-    width: calc(100% - 2px);
+    width: 100%;
+    box-sizing: border-box;
     position: absolute;
     background-color: red;
-    border-radius: 4px;
-    border: 1px solid crimson;
+    border-radius: 3px;
+    border: 1px solid black;
     cursor: pointer;
-    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.4);
   }
   &__additional-info {
     top: -108px;

@@ -4,9 +4,8 @@
       class="calendar__working-hours"
       v-if="calendarDay.workingHours"
       :style="{
-        height:
-          calendarDay.workingHours.to - calendarDay.workingHours.from + 'px',
-        top: calendarDay.workingHours.from + 'px'
+        height: workingHoursHeight,
+        top: workingHoursTop
       }"
     ></div>
     <CalendarEvent
@@ -26,10 +25,31 @@ export default Vue.extend({
   components: {
     CalendarEvent
   },
-  props: ["calendarDay"],
+  props: ["calendarDay", "events"],
   computed: {
-    allEvents(): any[] {
-      const allEvents = [];
+    workingHoursHeight(): string | number {
+      if (this.calendarDay.workingHours == null) {
+        return 0;
+      }
+      const toPixels =
+        this.calendarDay.workingHours.to.hours * 40 +
+        (this.calendarDay.workingHours.to.minutes / 60) * 40;
+      const fromPixels =
+        this.calendarDay.workingHours.from.hours * 40 +
+        (this.calendarDay.workingHours.from.minutes / 60) * 40;
+      return toPixels - fromPixels + "px";
+    },
+    workingHoursTop(): string | number {
+      if (this.calendarDay.workingHours == null) {
+        return 0;
+      }
+      const fromPixels =
+        this.calendarDay.workingHours.from.hours * 40 +
+        (this.calendarDay.workingHours.from.minutes / 60) * 40;
+      return fromPixels + "px";
+    },
+    allEvents(): CalendarEvent[] {
+      const allEvents = this.events;
       if (this.calendarDay.breakEvent) {
         allEvents.push(this.calendarDay.breakEvent);
       }

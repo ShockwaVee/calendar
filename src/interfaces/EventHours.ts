@@ -1,4 +1,10 @@
 export interface EventHours {
-  from: number;
-  to: number;
+  from: {
+    hours: number;
+    minutes: number;
+  };
+  to: {
+    hours: number;
+    minutes: number;
+  };
 }

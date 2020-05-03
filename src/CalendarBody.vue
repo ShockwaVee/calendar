@@ -9,9 +9,12 @@
       <div
         class="calendar__body-cell"
         v-for="calendarDay in calendarDays"
-        :key="calendarDay.momentObject.format()"
+        :key="calendarDay.momentObject.valueOf()"
       >
-        <CalendarCell :calendar-day="calendarDay"></CalendarCell>
+        <CalendarCell
+          :calendar-day="calendarDay"
+          :events="getEventsForDay(calendarDay)"
+        ></CalendarCell>
       </div>
     </div>
   </div>
@@ -20,6 +23,8 @@
 import Vue from "vue";
 import { formatHoursAndMinutes } from "@/helpers/DataFormatter";
 import CalendarCell from "@/components/CalendarCell.vue";
+import { CalendarDay } from "@/interfaces/CalendarDay";
+import { CalendarEvent } from "@/interfaces/CalendarEvent";
 
 export default Vue.extend({
   name: "CalendarBody",
@@ -31,14 +36,18 @@ export default Vue.extend({
       hoursInDay: [...Array(24).keys()]
     };
   },
-  props: {
-    calendarDays: {
-      required: true
-    }
-  },
+  props: ["calendarDays", "events"],
   methods: {
     formatTime(hours: number, minutes = 0) {
       return formatHoursAndMinutes(hours, minutes);
+    },
+    getEventsForDay(currentDay: CalendarDay) {
+      return this.events.filter((calendarEvent: CalendarEvent) => {
+        return calendarEvent.momentObjectFrom.isSame(
+          currentDay.momentObject,
+          "day"
+        );
+      });
     }
   }
 });
