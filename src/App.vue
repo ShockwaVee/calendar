@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" class="u-b0">
     <Calendar />
   </div>
 </template>
@@ -13,3 +13,8 @@ export default Vue.extend({
   components: { Calendar }
 });
 </script>
+
+<style lang="scss">
+#app {
+}
+</style>

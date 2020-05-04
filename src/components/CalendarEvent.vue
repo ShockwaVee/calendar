@@ -1,7 +1,10 @@
 <template>
   <div
-    class="calendar__event"
-    :class="{ 'is-user-generated': event.isUserGenerated }"
+    class="calendar__event u-b1"
+    :class="{
+      'is-user-generated': event.isUserGenerated,
+      'is-break': event.isBreak
+    }"
     @mouseenter="isTooltipVisible = true"
     @mouseleave="isTooltipVisible = false"
     :style="{
@@ -9,10 +12,11 @@
       top: eventTop
     }"
   >
+    <p class="calendar__event-name">{{ event.title }}</p>
     <transition name="slide-fade">
       <div v-show="isTooltipVisible" class="calendar__additional-info">
-        <h6>{{ event.title }}</h6>
-        <span
+        <h6 class="u-a3">{{ event.title }}</h6>
+        <span class="u-b0"
           >{{ event.momentObjectFrom.format("HH:mm") }} -
           {{ event.momentObjectTo.format("HH:mm") }}</span
         >
@@ -63,40 +67,63 @@ export default Vue.extend({
     width: 100%;
     box-sizing: border-box;
     position: absolute;
-    background-color: red;
+    background-color: $mpink;
     border-radius: 3px;
-    border: 1px solid black;
+    border-top: 1px solid $white;
     cursor: pointer;
-    &.is-user-generated {
-      background-color: green;
+    display: flex;
+    padding: 0 4px;
+    transition: background-color 0.3s ease-in-out;
+    &:hover {
+      background-color: $pink;
     }
+    &.is-user-generated {
+      background-color: $gainsboro;
+      &:hover {
+        background-color: $lighter-gainsboro;
+      }
+    }
+    &.is-break {
+      background-color: $blue;
+      &:hover {
+        background-color: $darker-blue;
+      }
+    }
+  }
+  &__event-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: auto 0;
+    color: white;
   }
   &__additional-info {
     top: -108px;
     position: absolute;
     width: 130px;
-    height: 80px;
-    background-color: white;
+    background-color: $white;
     z-index: 2;
-    border: 2px solid black;
-    padding: 5px;
+    border: 2px solid $black;
+    border-radius: 4px;
+    padding: 10px 5px;
     &:after {
       content: "";
       display: block;
       position: absolute;
-      top: calc(100% - 7.5px);
+      top: calc(100% - 6px);
       width: 15px;
       left: 10px;
       height: 15px;
       background: #ffffff;
-      border-left: 2px solid black;
-      border-bottom: 2px solid black;
+      border-left: 2px solid $black;
+      border-bottom: 2px solid $black;
       transform: rotate(-45deg);
     }
   }
   h6 {
-    margin: 0;
-    padding-bottom: 16px;
+    color: $lpink;
+    padding-bottom: 8px;
+    word-break: break-all;
   }
 }
 .slide-fade-enter-active {

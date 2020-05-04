@@ -7,4 +7,5 @@ export interface CalendarEvent {
   momentObjectFrom: Moment;
   momentObjectTo: Moment;
   isUserGenerated: boolean;
+  isBreak?: boolean;
 }

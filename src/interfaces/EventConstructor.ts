@@ -5,4 +5,5 @@ export interface EventConstructor {
   from: EventHoursInput;
   to?: EventHoursInput;
   isUserGenerated?: boolean;
+  isBreak?: boolean;
 }

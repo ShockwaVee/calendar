@@ -64,9 +64,9 @@ export default Vue.extend({
   }
 
   &__body-cell {
-    flex: 0 0 120px;
-    border-right: 1px solid black;
-    background-color: rgba(211, 211, 211, 0.81);
+    width: 100%;
+    border-right: 1px solid $silver;
+    background-color: $light-gray;
     position: relative;
   }
 
@@ -79,14 +79,14 @@ export default Vue.extend({
 
   &__time-cell {
     height: 60px;
-    border-right: 1px solid black;
+    border-right: 1px solid $silver;
 
     &::after {
       content: "";
       position: absolute;
       left: 0;
       right: 0;
-      border-top: 1px solid black;
+      border-top: 1px solid $silver;
       pointer-events: none;
     }
   }

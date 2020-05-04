@@ -6,7 +6,7 @@ import { EventHoursInput } from "@/interfaces/EventHoursInput";
 import { EventConstructor } from "@/interfaces/EventConstructor";
 
 export class CalendarService {
-  private readonly startingDate: Moment;
+  private readonly startingDate: Moment | null;
   private readonly workingHoursUsual = {
     from: {
       hours: 8,
@@ -48,68 +48,83 @@ export class CalendarService {
     }
   };
 
-  constructor(startingDate: Date) {
+  constructor(startingDate?: Date) {
+    if (startingDate == null) {
+      this.startingDate = null;
+      return;
+    }
     this.startingDate = moment(startingDate);
   }
 
   public generateNDays(numberOfDays: number): CalendarDay[] {
+    if (this.startingDate == null) {
+      console.error("Starting date is not set");
+      return [];
+    }
     const calendarDays: CalendarDay[] = [];
     let currentDate = this.startingDate.clone();
 
     for (let i = 0; i < numberOfDays; i++) {
-      let workingHours: EventHours | null = this.workingHoursUsual;
-      const from: EventHoursInput = {
-        hours: this.breakUsual.from.hours,
-        minutes: this.breakUsual.from.minutes,
-        date: currentDate.format("MM/DD/YYYY")
-      };
-      const to: EventHoursInput = {
-        hours: this.breakUsual.to.hours,
-        minutes: this.breakUsual.to.minutes,
-        date: currentDate.format("MM/DD/YYYY")
-      };
-
-      let breakEvent: CalendarEvent | null = CalendarService.constructEvent({
-        title: "Pauza",
-        from,
-        to
-      });
-
-      if (currentDate.date() % 2) {
-        workingHours = this.workingHoursAlternative;
-        from.hours = this.breakAlternative.from.hours;
-        from.minutes = this.breakAlternative.from.minutes;
-        to.hours = this.breakAlternative.to.hours;
-        to.minutes = this.breakAlternative.to.minutes;
-        breakEvent = CalendarService.constructEvent({
-          title: "Pauza",
-          from,
-          to
-        });
-      }
-      if (
-        currentDate.weekday() === 6 ||
-        (currentDate.weekday() === 5 && currentDate.date() % 2 !== 0)
-      ) {
-        workingHours = null;
-        breakEvent = null;
-      }
-
-      calendarDays.push({
-        momentObject: currentDate,
-        workingHours,
-        breakEvent
-      });
+      calendarDays.push(this.generateDay(currentDate));
       currentDate = currentDate.clone().add(1, "d");
     }
     return calendarDays;
+  }
+
+  public generateDay(currentDate: Moment) {
+    let workingHours: EventHours | null = this.workingHoursUsual;
+    const from: EventHoursInput = {
+      hours: this.breakUsual.from.hours,
+      minutes: this.breakUsual.from.minutes,
+      date: currentDate.format("MM/DD/YYYY")
+    };
+    const to: EventHoursInput = {
+      hours: this.breakUsual.to.hours,
+      minutes: this.breakUsual.to.minutes,
+      date: currentDate.format("MM/DD/YYYY")
+    };
+
+    let breakEvent: CalendarEvent | null = CalendarService.constructEvent({
+      title: "Pauza",
+      from,
+      to,
+      isBreak: true
+    });
+
+    if (currentDate.date() % 2) {
+      workingHours = this.workingHoursAlternative;
+      from.hours = this.breakAlternative.from.hours;
+      from.minutes = this.breakAlternative.from.minutes;
+      to.hours = this.breakAlternative.to.hours;
+      to.minutes = this.breakAlternative.to.minutes;
+      breakEvent = CalendarService.constructEvent({
+        title: "Pauza",
+        from,
+        to,
+        isBreak: true
+      });
+    }
+    if (
+      currentDate.weekday() === 6 ||
+      (currentDate.weekday() === 5 && currentDate.date() % 2 !== 0)
+    ) {
+      workingHours = null;
+      breakEvent = null;
+    }
+
+    return {
+      momentObject: currentDate,
+      workingHours,
+      breakEvent
+    };
   }
 
   public static constructEvent({
     title,
     from,
     to,
-    isUserGenerated = false
+    isUserGenerated = false,
+    isBreak = false
   }: EventConstructor): CalendarEvent {
     const momentObjectFrom = moment(
       `${from.date} ${from.hours}:${from.minutes}`
@@ -134,7 +149,8 @@ export class CalendarService {
       },
       momentObjectFrom,
       momentObjectTo,
-      isUserGenerated
+      isUserGenerated,
+      isBreak
     };
   }
 
@@ -198,17 +214,15 @@ export class CalendarService {
     const numberOfUserGeneratedEvents = events.filter(calendarEvent => {
       return calendarEvent.isUserGenerated;
     });
-    console.log(numberOfUserGeneratedEvents);
+
     if (numberOfUserGeneratedEvents.length >= 2) {
       return "Ne možete zakazati više od dva termina tjedno";
     }
     for (const calendarEvent of events) {
-      console.log(calendarEvent);
       if (
         calendarEvent.momentObjectFrom.isSame(event.momentObjectFrom, "day") &&
         calendarEvent.isUserGenerated
       ) {
-        console.log("hzs");
         return "Ne možete zakazati više od jednog termina dnevno!";
       }
     }

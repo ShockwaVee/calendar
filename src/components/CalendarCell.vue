@@ -57,7 +57,7 @@ export default Vue.extend({
       );
       return fromPixels + "px";
     },
-    allEvents(): CalendarEvent[] {
+    allEvents() {
       const allEvents = this.events;
       if (this.calendarDay.breakEvent) {
         allEvents.push(this.calendarDay.breakEvent);

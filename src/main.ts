@@ -6,7 +6,8 @@ import Toasted from "vue-toasted";
 
 Vue.use(Toasted, {
   duration: 3000,
-  position: "bottom-right"
+  position: "bottom-right",
+  containerClass: "u-b0"
 });
 
 moment.locale("hr");

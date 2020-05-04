@@ -41,7 +41,7 @@ export default Vue.extend({
       while (generatedEvents.length < 15) {
         const generatedDate = CalendarService.generateRandomDate(
           this.calendarDays[0].momentObject,
-          this.calendarDays[6].momentObject
+          this.calendarDays.slice(-1)[0].momentObject
         );
         const calendarDay = this.calendarDays.find(
           (calendarDay: CalendarDay) => {
@@ -53,7 +53,7 @@ export default Vue.extend({
         }
         const generatedEndDate = generatedDate.clone().add(30, "minutes");
         const generatedEvent = CalendarService.constructEvent({
-          title: "test",
+          title: `Termin ${generatedEvents.length}`,
           from: {
             hours: generatedDate.hour(),
             minutes: generatedDate.minute(),
@@ -88,7 +88,9 @@ export default Vue.extend({
 .calendar {
   display: flex;
   flex-direction: column;
-  width: 886px;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
   position: relative;
 }
 </style>

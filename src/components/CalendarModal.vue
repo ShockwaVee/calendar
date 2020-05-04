@@ -1,12 +1,31 @@
 <template>
   <div v-show="isVisible" class="modal__wrapper">
     <div class="modal">
-      <input type="date" v-model="eventInfo.date" />
-      <input type="text" v-model="eventInfo.hours" />
-      <input type="text" v-model="eventInfo.minutes" />
-      <input type="text" v-model="eventInfo.title" />
-      <button @click="onClose">X</button>
-      <button @click="onCreateEvent">Stvori</button>
+      <h6 class="u-a2 modal__title">Rezerviraj novi termin</h6>
+      <label class="modal-row">
+        <span>Naziv</span>
+        <input type="text" v-model="eventInfo.title" />
+      </label>
+      <label class="modal-row">
+        <span>Datum</span>
+        <datepicker
+          v-model="eventInfo.date"
+          format="dd.MM.yyyy."
+          :language="hr"
+        ></datepicker>
+      </label>
+      <label class="modal-row modal-row--small">
+        <span>Sati</span>
+        <input maxlength="2" type="text" v-model="eventInfo.hours" />
+      </label>
+      <label class="modal-row modal-row--small">
+        <span>Minute</span>
+        <input maxlength="2" type="text" v-model="eventInfo.minutes" />
+      </label>
+      <button class="modal__close-button" @click="onClose">×</button>
+      <button class="modal__button u-a3" @click="onCreateEvent">
+        Stvori
+      </button>
     </div>
   </div>
 </template>
@@ -16,10 +35,17 @@ import EventBus, { EventBusEvents } from "@/helpers/EventBus";
 import moment, { Moment } from "moment";
 import { CalendarService } from "@/services/CalendarService";
 import { CalendarDay } from "@/interfaces/CalendarDay";
+// @ts-ignore
+import Datepicker from "vuejs-datepicker";
+// @ts-ignore
+import { hr } from "vuejs-datepicker/dist/locale";
 
 export default Vue.extend({
   name: "CalendarModal",
   props: ["events"],
+  components: {
+    Datepicker
+  },
   data() {
     return {
       isVisible: false,
@@ -29,7 +55,9 @@ export default Vue.extend({
         minutes: "",
         title: ""
       },
-      calendarDay: null as null | CalendarDay
+      calendarDay: null as null | CalendarDay,
+      hr,
+      calendarService: null as null | CalendarService
     };
   },
   methods: {
@@ -61,14 +89,20 @@ export default Vue.extend({
       });
     },
     onCreateEvent() {
-      if (this.calendarDay == null) {
+      if (this.calendarDay == null || this.calendarService == null) {
         return;
       }
+      const currentDay = this.calendarService.generateDay(
+        moment(this.eventInfo.date)
+      );
       const newEvent = this.createEvent(
         +this.eventInfo.hours,
         +this.eventInfo.minutes,
         moment(this.eventInfo.date)
       );
+      if (newEvent == null) {
+        return;
+      }
       const isValidEventPlacement = CalendarService.validateMaximumNumberOfEvents(
         newEvent,
         this.events
@@ -77,7 +111,7 @@ export default Vue.extend({
         this.$toasted.error(isValidEventPlacement);
         return;
       }
-      if (!CalendarService.validateEvent(newEvent, this.calendarDay)) {
+      if (!CalendarService.validateEvent(newEvent, currentDay)) {
         this.$toasted.error(
           "Vrijeme termina nije ispravno. Molimo provjerite da se nalazi unutar radnog vremena."
         );
@@ -86,8 +120,8 @@ export default Vue.extend({
       if (
         CalendarService.validateOverlapping(
           newEvent,
-          [...this.events, this.calendarDay.breakEvent],
-          this.calendarDay
+          [...this.events, currentDay.breakEvent],
+          currentDay
         )
       ) {
         this.$toasted.error(
@@ -101,6 +135,7 @@ export default Vue.extend({
   },
   created() {
     EventBus.$on(EventBusEvents.openModal, this.onOpen);
+    this.calendarService = new CalendarService();
   },
   beforeDestroy() {
     EventBus.$off(EventBusEvents.openModal, this.onOpen);
@@ -109,10 +144,33 @@ export default Vue.extend({
 </script>
 <style lang="scss" scoped>
 .modal {
+  position: relative;
   width: 400px;
-  height: 200px;
   background: white;
   z-index: 21;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 20px 20px;
+  &__title {
+    padding-bottom: 24px;
+    text-align: center;
+  }
+  .modal-row {
+    display: flex;
+    margin-bottom: 8px;
+    span {
+      margin-right: 16px;
+    }
+    input {
+      flex: 1 0 auto;
+    }
+    &--small {
+      justify-content: space-between;
+      input {
+        max-width: 60px;
+      }
+    }
+  }
   &__wrapper {
     display: flex;
     position: fixed;
@@ -124,6 +182,35 @@ export default Vue.extend({
     z-index: 20;
     justify-content: center;
     align-items: center;
+  }
+
+  &__close-button {
+    position: absolute;
+    top: 6px;
+    right: 4px;
+    border: none;
+    background-color: transparent;
+    font-size: 40px;
+    cursor: pointer;
+    line-height: 16px;
+    transition: color 0.3s ease-in-out;
+    &:hover {
+      color: $mpink;
+    }
+  }
+
+  &__button {
+    margin-top: 16px;
+    padding: 8px 0;
+    background-color: $blue;
+    border: 1px solid $darker-blue;
+    border-radius: 2px;
+    cursor: pointer;
+    color: $white;
+    transition: background-color 0.3s ease-in-out;
+    &:hover {
+      background-color: $darker-blue;
+    }
   }
 }
 </style>
