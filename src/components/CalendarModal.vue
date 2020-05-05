@@ -4,23 +4,21 @@
       <h6 class="u-a2 modal__title">Rezerviraj novi termin</h6>
       <label class="modal-row">
         <span>Naziv</span>
-        <input type="text" v-model="eventInfo.title" />
+        <input maxlength="30" type="text" v-model="eventInfo.title" />
       </label>
       <label class="modal-row">
         <span>Datum</span>
-        <datepicker
-          v-model="eventInfo.date"
-          format="dd.MM.yyyy."
-          :language="hr"
-        ></datepicker>
+        <DatePicker v-model="eventInfo.date" format="DD.MM.YYYY."></DatePicker>
       </label>
-      <label class="modal-row modal-row--small">
-        <span>Sati</span>
-        <input maxlength="2" type="text" v-model="eventInfo.hours" />
-      </label>
-      <label class="modal-row modal-row--small">
-        <span>Minute</span>
-        <input maxlength="2" type="text" v-model="eventInfo.minutes" />
+      <label class="modal-row">
+        <span>Sati i minute</span>
+        <DatePicker
+          v-model="eventInfo.hoursAndMinutes"
+          type="time"
+          :show-time-header="true"
+          time-title-format="DD.MM.YYYY."
+          format="HH:mm"
+        ></DatePicker>
       </label>
       <button class="modal__close-button" @click="onClose">×</button>
       <button class="modal__button u-a3" @click="onCreateEvent">
@@ -35,28 +33,25 @@ import EventBus, { EventBusEvents } from "@/helpers/EventBus";
 import moment, { Moment } from "moment";
 import { CalendarService } from "@/services/CalendarService";
 import { CalendarDay } from "@/interfaces/CalendarDay";
-// @ts-ignore
-import Datepicker from "vuejs-datepicker";
-// @ts-ignore
-import { hr } from "vuejs-datepicker/dist/locale";
+import DatePicker from "vue2-datepicker";
+import "vue2-datepicker/index.css";
+import "vue2-datepicker/locale/hr";
 
 export default Vue.extend({
   name: "CalendarModal",
   props: ["events"],
   components: {
-    Datepicker
+    DatePicker
   },
   data() {
     return {
       isVisible: false,
       eventInfo: {
         date: new Date(),
-        hours: "",
-        minutes: "",
-        title: ""
+        title: "",
+        hoursAndMinutes: new Date()
       },
       calendarDay: null as null | CalendarDay,
-      hr,
       calendarService: null as null | CalendarService
     };
   },
@@ -68,9 +63,12 @@ export default Vue.extend({
       this.isVisible = true;
       const hours = Math.floor(yPosition / 60 + 7);
       const minutes = yPosition % 60;
-      this.eventInfo.hours = hours < 10 ? `0${hours}` : String(hours);
-      this.eventInfo.minutes = minutes < 10 ? `0${minutes}` : String(minutes);
-      this.eventInfo.date = date.momentObject.toDate();
+      const dateObject = date.momentObject
+        .clone()
+        .hour(hours)
+        .minute(minutes);
+      this.eventInfo.date = dateObject.toDate();
+      this.eventInfo.hoursAndMinutes = dateObject.toDate();
       this.calendarDay = date;
     },
     createEvent(hours: number, minutes: number, date: Moment) {
@@ -95,9 +93,10 @@ export default Vue.extend({
       const currentDay = this.calendarService.generateDay(
         moment(this.eventInfo.date)
       );
+      const hoursAndMinutes = moment(this.eventInfo.hoursAndMinutes);
       const newEvent = this.createEvent(
-        +this.eventInfo.hours,
-        +this.eventInfo.minutes,
+        hoursAndMinutes.hours(),
+        +hoursAndMinutes.minutes(),
         moment(this.eventInfo.date)
       );
       if (newEvent == null) {
@@ -158,6 +157,8 @@ export default Vue.extend({
   .modal-row {
     display: flex;
     margin-bottom: 8px;
+    align-items: center;
+    justify-content: space-between;
     span {
       margin-right: 16px;
     }

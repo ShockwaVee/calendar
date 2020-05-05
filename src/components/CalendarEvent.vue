@@ -98,9 +98,10 @@ export default Vue.extend({
     color: white;
   }
   &__additional-info {
-    top: -108px;
+    top: -112px;
+    height: 100px;
     position: absolute;
-    width: 130px;
+    min-width: 200px;
     background-color: $white;
     z-index: 2;
     border: 2px solid $black;
@@ -118,6 +119,15 @@ export default Vue.extend({
       border-left: 2px solid $black;
       border-bottom: 2px solid $black;
       transform: rotate(-45deg);
+    }
+    @include mq(lg) {
+      position: fixed;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      &:after {
+        content: none;
+      }
     }
   }
   h6 {

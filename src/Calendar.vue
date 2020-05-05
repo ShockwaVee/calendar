@@ -91,6 +91,8 @@ export default Vue.extend({
   width: 100%;
   max-width: 900px;
   margin: 0 auto;
-  position: relative;
+  @include mq(lg) {
+    padding: 0 10px;
+  }
 }
 </style>

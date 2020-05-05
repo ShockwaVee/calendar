@@ -56,6 +56,7 @@ export default Vue.extend({
 .calendar {
   &__body {
     display: flex;
+    position: relative;
   }
 
   &__body-cells {
@@ -80,6 +81,9 @@ export default Vue.extend({
   &__time-cell {
     height: 60px;
     border-right: 1px solid $silver;
+    @include mq(md) {
+      text-align: center;
+    }
 
     &::after {
       content: "";
