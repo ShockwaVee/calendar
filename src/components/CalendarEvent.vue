@@ -20,6 +20,14 @@
           >{{ event.momentObjectFrom.format("HH:mm") }} -
           {{ event.momentObjectTo.format("HH:mm") }}</span
         >
+        <template v-if="event.isUserGenerated">
+          <button
+            class="calendar__delete-button u-a1"
+            @click="onDeleteEvent(event)"
+          >
+            Obriši
+          </button>
+        </template>
       </div>
     </transition>
   </div>
@@ -30,10 +38,12 @@ import {
   convertTimeToHeightPixels,
   convertTimeToTopPixels
 } from "@/helpers/DataFormatter";
+import EventBus, { EventBusEvents } from "@/helpers/EventBus";
+import { CalendarEvent } from "@/interfaces/CalendarEvent";
 
 export default Vue.extend({
   name: "CalendarEvent",
-  props: ["event"],
+  props: ["event", "calendarDay"],
   computed: {
     eventHeight(): string {
       const toPixels = convertTimeToHeightPixels(
@@ -58,6 +68,11 @@ export default Vue.extend({
     return {
       isTooltipVisible: false
     };
+  },
+  methods: {
+    onDeleteEvent(event: CalendarEvent) {
+      EventBus.$emit(EventBusEvents.deleteEvent, event);
+    }
   }
 });
 </script>
@@ -99,7 +114,7 @@ export default Vue.extend({
   }
   &__additional-info {
     top: -112px;
-    height: 100px;
+    height: auto;
     position: absolute;
     min-width: 200px;
     background-color: $white;
@@ -134,6 +149,21 @@ export default Vue.extend({
     color: $lpink;
     padding-bottom: 8px;
     word-break: break-all;
+  }
+  &__delete-button {
+    padding: 4px 0;
+    display: block;
+    width: 50%;
+    margin: 16px auto 0 auto;
+    background-color: $mpink;
+    border: 1px solid $darker-mpink;
+    border-radius: 2px;
+    cursor: pointer;
+    color: $white;
+    transition: background-color 0.3s ease-in-out;
+    &:hover {
+      background-color: $darker-mpink;
+    }
   }
 }
 .slide-fade-enter-active {

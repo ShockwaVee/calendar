@@ -11,6 +11,7 @@
     ></div>
     <CalendarEvent
       v-for="(event, index) in allEvents"
+      :calendarDay="calendarDay"
       :event="event"
       :key="index"
     >
@@ -85,6 +86,7 @@ export default Vue.extend({
     width: 100%;
     position: absolute;
     background-color: white;
+    cursor: pointer;
   }
 }
 </style>

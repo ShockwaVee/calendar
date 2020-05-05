@@ -13,6 +13,7 @@ import CalendarHeader from "@/CalendarHeader.vue";
 import CalendarBody from "@/CalendarBody.vue";
 import { CalendarEvent } from "@/interfaces/CalendarEvent";
 import CalendarModal from "@/components/CalendarModal.vue";
+import EventBus, { EventBusEvents } from "@/helpers/EventBus";
 
 export default Vue.extend({
   name: "Calendar",
@@ -25,6 +26,7 @@ export default Vue.extend({
     };
   },
   created() {
+    EventBus.$on(EventBusEvents.deleteEvent, this.onDeleteEvent);
     const tomorrow = new Date();
     tomorrow.setDate(new Date().getDate() + 1);
     this.calendarService = new CalendarService(tomorrow);
@@ -80,7 +82,21 @@ export default Vue.extend({
     },
     onAddEvent(newEvent: CalendarEvent) {
       this.events.push(newEvent);
+    },
+    onDeleteEvent(event: CalendarEvent) {
+      const eventIndex = this.events.findIndex(
+        (calendarEvent: CalendarEvent) => {
+          return calendarEvent.momentObjectFrom.isSame(event.momentObjectFrom);
+        }
+      );
+      if (eventIndex === -1) {
+        return;
+      }
+      this.events.splice(eventIndex, 1);
     }
+  },
+  beforeDestroy() {
+    EventBus.$off(EventBusEvents.deleteEvent, this.onDeleteEvent);
   }
 });
 </script>
