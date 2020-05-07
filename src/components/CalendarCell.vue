@@ -2,6 +2,7 @@
   <div>
     <div
       class="calendar__working-hours"
+      data-test="working-hours"
       v-if="calendarDay.workingHours"
       @click="onCreateEvent"
       :style="{

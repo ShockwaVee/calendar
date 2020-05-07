@@ -4,16 +4,26 @@
       <h6 class="u-a2 modal__title">Rezerviraj novi termin</h6>
       <label class="modal-row">
         <span>Naziv</span>
-        <input maxlength="30" type="text" v-model="eventInfo.title" />
+        <input
+          data-test="title"
+          maxlength="30"
+          type="text"
+          v-model="eventInfo.title"
+        />
       </label>
       <label class="modal-row">
         <span>Datum</span>
-        <DatePicker v-model="eventInfo.date" format="DD.MM.YYYY."></DatePicker>
+        <DatePicker
+          data-test="date"
+          v-model="eventInfo.date"
+          format="DD.MM.YYYY."
+        ></DatePicker>
       </label>
       <label class="modal-row">
         <span>Sati i minute</span>
         <DatePicker
           v-model="eventInfo.hoursAndMinutes"
+          data-test="hoursAndMinutes"
           type="time"
           :show-time-header="true"
           time-title-format="DD.MM.YYYY."
@@ -21,7 +31,11 @@
         ></DatePicker>
       </label>
       <button class="modal__close-button" @click="onClose">×</button>
-      <button class="modal__button u-a3" @click="onCreateEvent">
+      <button
+        class="modal__button u-a3"
+        @click="onCreateEvent"
+        data-test="create-button"
+      >
         Stvori
       </button>
     </div>
@@ -57,6 +71,7 @@ export default Vue.extend({
   },
   methods: {
     onClose() {
+      this.eventInfo.title = "";
       this.isVisible = false;
     },
     onOpen({ yPosition, date }: { yPosition: number; date: CalendarDay }) {

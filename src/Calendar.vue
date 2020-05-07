@@ -9,8 +9,8 @@
 import Vue from "vue";
 import { CalendarService } from "@/services/CalendarService";
 import { CalendarDay } from "@/interfaces/CalendarDay";
-import CalendarHeader from "@/CalendarHeader.vue";
-import CalendarBody from "@/CalendarBody.vue";
+import CalendarHeader from "@/components/CalendarHeader.vue";
+import CalendarBody from "@/components/CalendarBody.vue";
 import { CalendarEvent } from "@/interfaces/CalendarEvent";
 import CalendarModal from "@/components/CalendarModal.vue";
 import EventBus, { EventBusEvents } from "@/helpers/EventBus";

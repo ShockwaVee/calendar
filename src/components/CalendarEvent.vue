@@ -1,6 +1,7 @@
 <template>
   <div
     class="calendar__event u-b1"
+    :data-test="event.isUserGenerated ? 'user-event' : 'generated-event'"
     :class="{
       'is-user-generated': event.isUserGenerated,
       'is-break': event.isBreak
@@ -24,6 +25,7 @@
           <button
             class="calendar__delete-button u-a1"
             @click="onDeleteEvent(event)"
+            data-test="delete-event"
           >
             Obriši
           </button>

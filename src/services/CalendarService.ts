@@ -168,14 +168,19 @@ export class CalendarService {
     const workingHoursStart = calendarDay.momentObject
       .clone()
       .hour(calendarDay.workingHours.from.hours)
-      .minute(calendarDay.workingHours.from.minutes);
+      .minute(calendarDay.workingHours.from.minutes)
+      .second(0);
     const workingHoursEnd = calendarDay.momentObject
       .clone()
       .hour(calendarDay.workingHours.to.hours)
-      .minute(calendarDay.workingHours.to.minutes);
+      .minute(calendarDay.workingHours.to.minutes)
+      .second(0);
+
     return (
-      event.momentObjectFrom.valueOf() >= workingHoursStart.valueOf() &&
-      event.momentObjectTo.valueOf() <= workingHoursEnd.valueOf()
+      event.momentObjectFrom.valueOf() >=
+        workingHoursStart.valueOf() - (workingHoursStart.valueOf() % 1800) &&
+      event.momentObjectTo.valueOf() <=
+        workingHoursEnd.valueOf() - (workingHoursEnd.valueOf() % 1800)
     );
   }
 
